@@ -1,5 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+import os
+import uuid
+
+
+def file_upload(instance, filename):
+    """This function is used to upload the user's avatar"""
+    ext = filename.split('.')[-1]
+    filename = f"{instance.username}.{ext}"
+    return os.path.join('users/avatars/', filename)
 
 
 # Create your models here.
@@ -7,6 +16,7 @@ from django.contrib.auth.models import AbstractUser
 class CustomUser(AbstractUser):
     """This model represent a custom user"""
     middle_name = models.CharField(max_length=30, blank=True, null=True)
+    avatar = models.ImageField(upload_to=file_upload, blank=True)
 
     class Meta:
         db_table = "user"

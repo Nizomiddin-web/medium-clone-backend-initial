@@ -7,8 +7,9 @@ from django.http import JsonResponse
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('health/', lambda _: JsonResponse({'detail': 'Healthy'}), name='health'),
-    path('users/',include('users.urls'))
+    path('users/', include('users.urls'))
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
