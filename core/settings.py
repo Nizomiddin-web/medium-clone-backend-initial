@@ -135,3 +135,21 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = 'users.CustomUser'
+
+# Image Resize default
+DJANGORESIZED_DEFAULT_SIZE = [1920, 1080]
+
+# Rasm o'lchamini o'zgartirish
+DJANGORESIZED_DEFAULT_SCALE = 1
+
+# Rasm sifatini saqlash ko'rsatkichi
+DJANGORESIZED_DEFAULT_QUALITY = 80
+
+# O'lchamni o'zgartirib defaultni saqlab qoladi
+DJANGORESIZED_DEFAULT_KEEP_META = True
+
+# Rasm formati
+DJANGORESIZED_DEFAULT_FORMAT_EXTENSIONS = {'JPEG': ".jpg"}
+
+# Aylanishni normallashtirish
+DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
