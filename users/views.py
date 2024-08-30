@@ -9,10 +9,11 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 # SignUp qilish uchun class
 class SignupView(APIView):
     serializer_class = UserSerializer
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = [permissions.AllowAny, ]
 
     def post(self, request):
         serializer = UserSerializer(data=request.data)
@@ -28,11 +29,10 @@ class SignupView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 # Login qilish uchun class
 class LoginView(APIView):
     serializer_class = LoginSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny, ]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -54,16 +54,14 @@ class LoginView(APIView):
             return Response({'detail': 'Hisob maʼlumotlari yaroqsiz'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-
 # User malumotlarni olish uchum class
 class UsersMe(generics.RetrieveAPIView, generics.UpdateAPIView):
-    http_method_names = ['get',]
+    http_method_names = ['get', ]
     queryset = User.objects.filter(is_active=True)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated,]
 
     def get_object(self):
         return self.request.user
 
     def get_serializer_class(self):
         return UserSerializer
-
