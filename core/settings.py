@@ -120,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # RestFramework
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASS': [
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication'
     ],

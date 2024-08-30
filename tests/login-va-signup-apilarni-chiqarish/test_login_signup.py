@@ -352,8 +352,6 @@ def test_user_me(user_me_data, api_client):
     assert resp.status_code == status_code
     if status_code == status.HTTP_200_OK:
         resp_json = resp.json()
-        print("access: ", resp_json['access'])
-        print("access: ", resp_json['refresh'])
         assert sorted(resp_json.keys()) == sorted(
             ['id', 'first_name', 'last_name', 'middle_name', 'email', 'username', 'avatar']
         )

@@ -58,7 +58,7 @@ class LoginView(APIView):
 class UsersMe(generics.RetrieveAPIView, generics.UpdateAPIView):
     http_method_names = ['get', ]
     queryset = User.objects.filter(is_active=True)
-    permission_classes = [IsAuthenticated,]
+    permission_classes = (IsAuthenticated,)
 
     def get_object(self):
         return self.request.user
