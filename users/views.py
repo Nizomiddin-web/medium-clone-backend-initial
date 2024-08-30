@@ -1,19 +1,18 @@
-from django.contrib.auth import authenticate, get_user_model
-from django.shortcuts import render
-
-# Create your views here.
-from rest_framework import permissions, status, generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import status, permissions, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
+from .serializers import UserSerializer, LoginSerializer, ValidationErrorSerializer, TokenResponseSerializer
+from django.contrib.auth import get_user_model
 
-from users.serializers import UserSerializer, LoginSerializer
 User = get_user_model()
 
+# SignUp qilish uchun class
 class SignupView(APIView):
     serializer_class = UserSerializer
-    permission_classes = permissions.AllowAny
+    permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
         serializer = UserSerializer(data=request.data)
@@ -29,9 +28,11 @@ class SignupView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+# Login qilish uchun class
 class LoginView(APIView):
     serializer_class = LoginSerializer
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -42,6 +43,7 @@ class LoginView(APIView):
             username=serializer.validated_data['username'],
             password=serializer.validated_data['password']
         )
+
         if user is not None:
             refresh = RefreshToken.for_user(user)
             return Response({
@@ -49,7 +51,8 @@ class LoginView(APIView):
                 'access': str(refresh.access_token),
             }, status=status.HTTP_200_OK)
         else:
-            return Response({'detail': 'Hisob ma\'lumotlari yaroqsiz'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'detail': 'Hisob maʼlumotlari yaroqsiz'}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 
 # User malumotlarni olish uchum class
@@ -63,3 +66,4 @@ class UsersMe(generics.RetrieveAPIView, generics.UpdateAPIView):
 
     def get_serializer_class(self):
         return UserSerializer
+
