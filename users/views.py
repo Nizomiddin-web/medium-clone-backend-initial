@@ -13,7 +13,7 @@ User = get_user_model()
 
 class SignupView(APIView):
     serializer_class = UserSerializer
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = permissions.AllowAny
 
     def post(self, request):
         serializer = UserSerializer(data=request.data)
