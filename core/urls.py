@@ -16,7 +16,7 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('schema/', user_passes_test(is_superuser)(SpectacularAPIView.as_view()), name='schema'),
     path('redoc/', user_passes_test(is_superuser)(SpectacularRedocView.as_view()), name='redoc'),
-    path('swagger/', user_passes_test(is_superuser)(SpectacularSwaggerView.as_view()), name='swagger')
+    path('swagger/', user_passes_test(is_superuser)(SpectacularSwaggerView.as_view()), name='swagger-ui')
 ]
 
 if settings.DEBUG:
