@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta,datetime
 from pathlib import Path
 from decouple import config
 
@@ -248,3 +248,6 @@ SPECTACULAR_SETTINGS = {
         }
     },
 }
+
+BIRTH_YEAR_MIN = 1900
+BIRTH_YEAR_MAX = datetime.now().year
