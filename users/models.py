@@ -49,10 +49,10 @@ class CustomUser(AbstractUser):
         ordering = ["-date_joined"]  # describing order joined
 
         indexes = [
-            HashIndex(fields=['first_name'],name='%(class)s_first_name_hash_idx)'),
-            HashIndex(fields=['last_name'],name='%(class)s_last_name_hash_idx'),
-            HashIndex(fields=['middle_name'],name='%(class)s_middle_name_hash_idx'),
-            models.Index(fields=['username'],name='%(class)s_username_idx'),
+            HashIndex(fields=['first_name'], name='%(class)s_first_name_hash_idx'),
+            HashIndex(fields=['last_name'], name='%(class)s_last_name_hash_idx'),
+            HashIndex(fields=['middle_name'], name='%(class)s_middle_name_hash_idx'),
+            models.Index(fields=['username'], name='%(class)s_username_idx'),
         ]
 
 
