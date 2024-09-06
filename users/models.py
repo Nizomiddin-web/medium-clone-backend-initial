@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.postgres.indexes import HashIndex
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -46,6 +47,14 @@ class CustomUser(AbstractUser):
         verbose_name = "User"
         verbose_name_plural = "Users"
         ordering = ["-date_joined"]  # describing order joined
+
+        indexes = [
+            HashIndex(fields=['first_name'],name='%(class)s_first_name_hash_idx)'),
+            HashIndex(fields=['last_name'],name='%(class)s_last_name_hash_idx'),
+            HashIndex(fields=['middle_name'],name='%(class)s_middle_name_hash_idx'),
+            models.Index(fields=['username'],name='%(class)s_username_idx'),
+        ]
+
 
         constraints = [
             models.CheckConstraint(
