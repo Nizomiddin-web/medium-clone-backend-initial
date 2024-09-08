@@ -48,7 +48,7 @@ class UserSerializer(serializers.ModelSerializer):  # user uchun [serializer](<h
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'middle_name', 'email', 'avatar','birth_year']
+        fields = ['id', 'first_name', 'last_name', 'middle_name', 'email', 'avatar', 'birth_year']
 
     def validate_birth_year(self, value):
         if not (settings.BIRTH_YEAR_MIN < value < settings.BIRTH_YEAR_MAX):
