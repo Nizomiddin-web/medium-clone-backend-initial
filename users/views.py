@@ -1,3 +1,4 @@
+import random
 from rest_framework import status, permissions, generics, parsers
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,7 +11,7 @@ from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from django_redis import get_redis_connection
 
-from .services import UserService
+from .services import UserService, SendEmailService
 
 User = get_user_model()
 
@@ -99,6 +100,9 @@ class UsersMe(generics.RetrieveAPIView, generics.UpdateAPIView):
         return self.request.user
 
     def get_serializer_class(self):
+        email = self.request.user.email
+        code = random.randint(10000, 99999)
+        SendEmailService.send_email(email, code)
         if self.request.method == 'PATCH':
             return UserUpdateSerializer
         return UserSerializer
