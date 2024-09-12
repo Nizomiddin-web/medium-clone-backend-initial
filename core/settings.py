@@ -5,6 +5,10 @@ from decouple import config
 from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from loguru import logger
+
+from core.custom_logging import InterceptHandler
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -63,7 +67,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'core.middlewares.CustomLocaleMiddleware',
-    'django.middleware.locale.LocaleMiddleware'
+    'django.middleware.locale.LocaleMiddleware',
+    'core.middlewares.LogRequestMiddleware',
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -101,6 +106,8 @@ REDIS_PORT = config('REDIS_PORT', default='6379')
 REDIS_DB = config('REDIS_DB', default='1')
 
 REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+# redis qo'shilgan joyga yozing
+logger.info(f"Using redis | URL: {REDIS_URL}")
 
 CACHES = {
     'default': {
@@ -208,8 +215,8 @@ LANGUAGES = [
     ('ru', _("Russian")),
     ('uz', _("Uzbek")),
 ]
-MODELTRANSLATION_LANGUAGES = ('en', 'ru','uz')
-MODELTRANSLATION_DEFAULT_LANGUAGE ='uz'
+MODELTRANSLATION_LANGUAGES = ('en', 'ru', 'uz')
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz'
 
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale/'),
@@ -277,3 +284,29 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 
 BIRTH_YEAR_MIN = 1900
 BIRTH_YEAR_MAX = datetime.now().year
+
+
+# LOGURU settings
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'intercept': {
+            '()': InterceptHandler,
+            'level': 0,
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'django.log',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['intercept', 'file'],
+            'level': "DEBUG",
+            'propagate': True,
+        },
+    }
+}
