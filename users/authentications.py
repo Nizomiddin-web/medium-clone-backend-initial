@@ -5,6 +5,7 @@ from rest_framework.request import Request
 from rest_framework_simplejwt.authentication import JWTAuthentication, AuthUser
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import Token
+from django.utils.translation import gettext_lazy as _
 
 from users.enums import TokenType        # keyinroq ushbu faylni yaratib olamiz
 from users.services import TokenService
@@ -24,7 +25,7 @@ class CustomJWTAuthentication(JWTAuthentication):
         user, access_token = super().authenticate(request)
 
         if not self.is_valid_access_token(user, access_token):
-            raise AuthenticationFailed("Access tokeni yaroqsiz")
+            raise AuthenticationFailed(_("Access tokeni yaroqsiz"))
 
         return user, access_token
 
@@ -36,5 +37,5 @@ class CustomJWTAuthentication(JWTAuthentication):
                 valid_access_tokens
                 and str(access_token).encode() not in valid_access_tokens
         ):
-            raise AuthenticationFailed("Kirish ma'lumotlari yaroqsiz")
+            raise AuthenticationFailed(_("Kirish ma'lumotlari yaroqsiz"))
         return True

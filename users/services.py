@@ -12,7 +12,7 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from django.utils.translation import gettext_lazy as _
 from users.enums import TokenType
 
 # redis uchun malumotlarni olamiz
@@ -105,7 +105,7 @@ class SendEmailService:
     @staticmethod
     def send_email(email, otp_code):
         subject = 'Welcome to Our Service!'
-        message = render_to_string('emails/new_html.html', {
+        message = render_to_string('emails/email_template.html', {
             'email': email,
             'otp_code': otp_code
         })
@@ -141,7 +141,7 @@ class OTPService:
         if check_if_exists and redis_conn.exists(key):
             ttl = redis_conn.ttl(key)
             raise OTPException(
-                ("Sizda yaroqli OTP kodingiz bor. {ttl} soniyadan keyin qayta urinib koʻring.").format(ttl=ttl)
+                _("Sizda yaroqli OTP kodingiz bor. {ttl} soniyadan keyin qayta urinib koʻring.").format(ttl),ttl
             )
         redis_conn.set(key, otp_hash, ex=expire_in)
         return otp_code, secret_token
@@ -152,7 +152,7 @@ class OTPService:
         stored_hash = redis_conn.get(f"{email}:otp")
 
         if not stored_hash or not check_password(f"{otp_secret}:{otp_code}", stored_hash.decode()):
-            raise OTPException("Yaroqsiz OTP kodi.")
+            raise OTPException(_("Yaroqsiz OTP kodi."))
 
     @classmethod
     def generate_token(cls) -> str:

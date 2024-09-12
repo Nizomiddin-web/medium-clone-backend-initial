@@ -1,6 +1,8 @@
-from datetime import timedelta,datetime
+import os
+from datetime import timedelta, datetime
 from pathlib import Path
 from decouple import config
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,7 +44,8 @@ EXTERNAL_APPS = [
     "rest_framework",
     'rest_framework_simplejwt',
     'drf_spectacular',
-    'django_redis'
+    'django_redis',
+    'modeltranslation'
 ]
 
 LOCAL_APPS = [
@@ -59,6 +62,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'core.middlewares.CustomLocaleMiddleware',
+    'django.middleware.locale.LocaleMiddleware'
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -190,13 +195,25 @@ SIMPLE_JWT = {
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en-US"
 
 TIME_ZONE = "Asia/Tashkent"
 
 USE_I18N = True
 
 USE_TZ = True
+
+LANGUAGES = [
+    ('en', _("English")),
+    ('ru', _("Russian")),
+    ('uz', _("Uzbek")),
+]
+MODELTRANSLATION_LANGUAGES = ('en', 'ru','uz')
+MODELTRANSLATION_DEFAULT_LANGUAGE ='uz'
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale/'),
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -233,7 +250,6 @@ DJANGORESIZED_DEFAULT_FORMAT_EXTENSIONS = {'JPEG': ".jpg"}
 
 # Aylanishni normallashtirish
 DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
-
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Medium',
