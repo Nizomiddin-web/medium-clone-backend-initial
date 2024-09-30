@@ -37,6 +37,9 @@ class Article(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     topics = models.ManyToManyField(Topic)
 
+    class Meta:
+        db_table = 'article'
+
 
 class Clap(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='claps')
