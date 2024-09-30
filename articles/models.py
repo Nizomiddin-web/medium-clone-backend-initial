@@ -39,7 +39,7 @@ class Article(models.Model):
 
     class Meta:
         db_table = 'article'
-
+        verbose_name = 'Article'
 
 class Clap(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='claps')
