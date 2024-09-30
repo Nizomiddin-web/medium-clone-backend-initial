@@ -40,6 +40,9 @@ class Article(models.Model):
     class Meta:
         db_table = 'article'
         verbose_name = 'Article'
+        verbose_name_plural = 'Articles'
+        ordering = ['-created_at']
+
 
 class Clap(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='claps')
