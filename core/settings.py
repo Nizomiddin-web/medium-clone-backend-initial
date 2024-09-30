@@ -19,7 +19,7 @@ SECRET_KEY = config('SECRET_KEY', default='')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
-
+AUTH_USER_MODEL = 'users.CustomUser'
 ALLOWED_HOSTS = []
 
 # Application definition
@@ -54,6 +54,7 @@ EXTERNAL_APPS = [
 
 LOCAL_APPS = [
     "users",
+    "articles"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + LOCAL_APPS
@@ -238,7 +239,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'users.CustomUser'
 
 # Image Resize default
 DJANGORESIZED_DEFAULT_SIZE = [1920, 1080]

@@ -15,7 +15,7 @@ def file_upload(instance, filename):
     """This function is used to upload the user's avatar"""
     ext = filename.split('.')[-1]
     filename = f"{instance.username}.{ext}"
-    return os.path.join('users/avatars/', filename)
+    return os.path.join('users/avatars', filename)
 
 
 # Create your models here.
@@ -55,10 +55,10 @@ class CustomUser(AbstractUser):
             models.Index(fields=['username'], name='%(class)s_username_idx'),
         ]
 
-
         constraints = [
             models.CheckConstraint(
-                check=models.Q(birth_year__gt=settings.BIRTH_YEAR_MIN) & models.Q(birth_year__lt=settings.BIRTH_YEAR_MAX),
+                check=models.Q(birth_year__gt=settings.BIRTH_YEAR_MIN) & models.Q(
+                    birth_year__lt=settings.BIRTH_YEAR_MAX),
                 name='check_birth_year_range'
             )
         ]
