@@ -24,6 +24,7 @@ class Topic(models.Model):
         db_table = 'topic'
         verbose_name = 'Topic'
         verbose_name_plural = 'Topics'
+        ordering = ['name']
 
     def __str__(self):
         return f"Topic: {self.name}"
