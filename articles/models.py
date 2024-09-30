@@ -20,6 +20,11 @@ class Topic(models.Model):
     description = models.CharField()
     is_active = models.BooleanField(default=False)
 
+    class Meta:
+        db_table = 'topic'
+        verbose_name = 'Topic'
+        verbose_name_plural = 'Topics'
+
     def __str__(self):
         return f"Topic: {self.name}"
 
