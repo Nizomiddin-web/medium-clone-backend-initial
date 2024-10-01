@@ -202,9 +202,9 @@ def test_article_create(test_article_create_data, api_client, tokens):
         "content": data.get('content'),
         "topic_ids": data.get('topics')
     }
-
+    print(data)
     response = client.post('/articles/', data=data, format='multipart')
-
+    print(response)
     assert response.status_code == status_code
 
     if status_code == 201:
