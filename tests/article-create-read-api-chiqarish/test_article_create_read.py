@@ -204,7 +204,8 @@ def test_article_create(test_article_create_data, api_client, tokens):
     }
     print(data)
     response = client.post('/articles/', data=data, format='multipart')
-    print(response)
+    print(response.data)
+    print(response.status_code)
     assert response.status_code == status_code
 
     if status_code == 201:

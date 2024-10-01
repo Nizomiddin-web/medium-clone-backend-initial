@@ -36,7 +36,7 @@ class Article(models.Model):
     summary = models.CharField(max_length=400)
     content = models.TextField()
     status = models.CharField(max_length=20, choices=StatusChoice.choices, default=StatusChoice.PENDING)
-    thumbnail = models.ImageField(upload_to=upload_image)
+    thumbnail = models.ImageField(upload_to=upload_image,null=True,blank=True)
     views_count = models.PositiveIntegerField(default=0)
     reads_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
