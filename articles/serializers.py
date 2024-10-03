@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from articles.models import Article, Topic, Clap
+from articles.models import Article, Topic, Clap, Comment
 from users.models import CustomUser
 
 
@@ -47,6 +47,12 @@ class ClapSerializer(serializers.ModelSerializer):
         fields = ['user', 'article']
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'user', 'article']
+
+
 class ArticleDetailSerializer(serializers.ModelSerializer):
     topics = TopicSerializer(many=True, read_only=True)
     author = AuthorSerializer(read_only=True)
@@ -56,3 +62,16 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
         model = Article
         fields = ['id', 'author', 'title', 'summary', 'content', 'status', 'thumbnail', 'views_count', 'reads_count',
                   'created_at', 'updated_at', 'topics', 'claps']
+
+
+class ArticleListSerializer(serializers.ModelSerializer):
+    topics = TopicSerializer(many=True, read_only=True)
+    author = AuthorSerializer(read_only=True)
+    claps_count = serializers.IntegerField(read_only=True)
+    comments_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Article
+        fields = ['id', 'author', 'title', 'summary', 'content', 'status', 'thumbnail', 'views_count', 'reads_count',
+                  'created_at', 'updated_at', 'topics', 'comments_count', 'claps_count']
+

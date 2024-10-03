@@ -5,6 +5,7 @@ cfgv==3.4.0
 colorama==0.4.6
 distlib==0.3.8
 Django==4.2.14
+django-filter==24.3
 django-modeltranslation==0.19.9
 django-redis==5.4.0
 django-resized==1.0.2
