@@ -4,16 +4,23 @@ from secrets import token_urlsafe
 from django.contrib.auth.hashers import make_password
 from rest_framework import status, permissions, generics, parsers, exceptions
 from rest_framework.exceptions import ValidationError
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate, update_session_auth_hash
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 
+from articles.models import Article
 from .errors import ACTIVE_USER_NOT_FOUND_ERROR_MSG
+
+# from .models import Recommendation
+from .models import Recommendation
 from .serializers import UserSerializer, LoginSerializer, ValidationErrorSerializer, TokenResponseSerializer, \
     UserUpdateSerializer, ChangePasswordSerializer, ForgotPasswordRequestSerializer, ForgotPasswordResponseSerializer, \
-    ForgotPasswordVerifyRequestSerializer, ForgotPasswordVerifyResponseSerializer, ResetPasswordResponseSerializer
+    ForgotPasswordVerifyRequestSerializer, ForgotPasswordVerifyResponseSerializer, ResetPasswordResponseSerializer, \
+    RecommendationSerializer
+
 from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from django_redis import get_redis_connection
@@ -281,3 +288,36 @@ class ResetPasswordView(generics.UpdateAPIView):
         tokens = UserService.create_tokens(user, is_force_add_to_redis=True)
         redis_conn.delete(token_hash)
         return Response(tokens)
+
+
+@extend_schema_view(
+    patch=extend_schema(
+        summary="Recommend View",
+        request=RecommendationSerializer,
+        responses={
+            204: RecommendationSerializer,
+            404: RecommendationSerializer
+        }
+    )
+)
+class RecommendationView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = RecommendationSerializer
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        more_article_id = request.data.get('more_article_id')
+        less_article_id = request.data.get('less_article_id')
+        recommendation, created = Recommendation.objects.get_or_create(user=user)
+
+        if more_article_id:
+            article = Article.objects.get(id=more_article_id)
+            recommendation.add_to_more_recommend(article)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        if less_article_id:
+            article = Article.objects.get(id=less_article_id)
+            recommendation.add_to_less_recommend(article)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -1,7 +1,9 @@
 import os
+
+from django.conf import settings
 from django.db import models
 # Create your models here.
-from users.models import CustomUser
+
 
 
 def upload_image(instance, filename):
@@ -29,7 +31,7 @@ class Topic(models.Model):
 
 
 class Article(models.Model):
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     summary = models.CharField(max_length=400)
     content = models.TextField()
@@ -40,6 +42,7 @@ class Article(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     topics = models.ManyToManyField(Topic)
+    is_recommend = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'article'
@@ -52,12 +55,12 @@ class Article(models.Model):
 
 
 class Clap(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='claps')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='claps')
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='claps')
 
 
 class Comment(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

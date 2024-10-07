@@ -19,7 +19,6 @@ SECRET_KEY = config('SECRET_KEY', default='')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
-AUTH_USER_MODEL = 'users.CustomUser'
 ALLOWED_HOSTS = []
 
 # Application definition
@@ -59,7 +58,7 @@ LOCAL_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + LOCAL_APPS
-
+AUTH_USER_MODEL = 'users.CustomUser'
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

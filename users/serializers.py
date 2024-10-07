@@ -5,7 +5,11 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+
+from articles.models import Article
 from users.errors import BIRTH_YEAR_ERROR_MSG
+# from users.models import Recommendation
+from users.models import Recommendation
 
 User = get_user_model()
 
@@ -149,3 +153,37 @@ class ResetPasswordResponseSerializer(serializers.Serializer):
         except ValidationError as e:
             raise serializers.ValidationError(e.messages)
         return value
+
+
+class RecommendationSerializer(serializers.ModelSerializer):
+    more_article_id = serializers.IntegerField(required=False)
+    less_article_id = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = Recommendation
+        fields = ['more_article_id', 'less_article_id']
+
+    def update(self, instance, validated_data):
+        more_article_id = validated_data.get('more_article_id', None)
+        less_article_id = validated_data.get('less_article_id', None)
+
+        if more_article_id:
+            try:
+                article = Article.objects.get(id=more_article_id)
+                if instance.less_recommend.filter(id=more_article_id).exists():
+                    instance.less_recommend.remove(article)
+                instance.more_recommend.add(article)
+            except:
+                raise serializers.ValidationError("Article Not Found")
+        if less_article_id:
+            try:
+                article = Article.objects.get(id=less_article_id)
+                if not instance.more_recommend.filter(id=less_article_id).exists():
+                    instance.less_recommend.add(article)
+                else:
+                    raise serializers.ValidationError("Article is already in more_recommend")
+            except:
+                raise serializers.ValidationError("Article Not Found")
+
+        instance.save()
+        return instance

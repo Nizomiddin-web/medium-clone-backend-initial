@@ -69,7 +69,7 @@ def rim_number_change_to_number(rim_number):
             j += 2
 
 
-print(rim_number_change_to_number('I'))
+# print(rim_number_change_to_number('I'))
 
 
 def remove_element(nums: list[int], val: int) -> int:
@@ -79,3 +79,11 @@ def remove_element(nums: list[int], val: int) -> int:
             nums[k] = nums[i]
             k += 1
     return len(nums)
+
+
+def str_str(haystack: str, needle: str) -> int:
+    a = haystack.find(needle)
+    print(a)
+
+
+print(str_str("hellolloollooll", "kskks"))

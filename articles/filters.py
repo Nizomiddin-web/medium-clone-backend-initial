@@ -9,7 +9,7 @@ class ArticleFilter(filters.FilterSet):
 
     class Meta:
         model = Article
-        fields = ['get_top_articles', 'topic_id']
+        fields = ['get_top_articles', 'topic_id', 'is_recommend']
 
     def filter_top_articles(self, queryset, name, value):
         if value:

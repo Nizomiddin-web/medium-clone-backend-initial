@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.conf import settings
 from django.contrib.postgres.indexes import HashIndex
 from django.core import validators
@@ -8,6 +9,7 @@ import os
 from django_resized import ResizedImageField
 import uuid
 
+from articles.models import Article, Topic
 from users.errors import BIRTH_YEAR_ERROR_MSG
 
 
@@ -74,3 +76,34 @@ class CustomUser(AbstractUser):
     def full_name(self):
         """This function return user's full name."""
         return f"{self.last_name} {self.first_name} {self.middle_name}"
+
+
+class Recommendation(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='recommendations')
+    more_recommend = models.ManyToManyField(Topic, related_name='more_recommended_by_users', blank=True)
+    less_recommend = models.ManyToManyField(Topic, related_name='less_recommended_by_users', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        db_table = 'recommendation'
+        verbose_name = 'Recommendation'
+        verbose_name_plural = 'Recommendations'
+        ordering = ['-created_at']
+
+    def add_to_more_recommend(self, article):
+        article_topics = article.topics.all()
+        self.less_recommend.remove(*article_topics)  # `less_recommend` dan olib tashlang
+        self.more_recommend.add(*article_topics)  # `more_recommend` ga qo'shish
+        article.is_recommend = True
+        article.save()
+
+    def add_to_less_recommend(self, article):
+        article_topics = article.topics.all()
+        article.is_recommend = False
+        article.save()
+        # `more_recommend` ichida yo'qligini tekshirish
+        if not article_topics.filter(id__in=self.more_recommend.all()).exists():
+            self.less_recommend.add(*article_topics)  # Faqat `more_recommend` da yo'q bo'lsa qo'shish
+
+
+    def __str__(self):
+        return f"Recommendations for {self.user.username}"
