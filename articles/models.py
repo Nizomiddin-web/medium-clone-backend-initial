@@ -2,8 +2,9 @@ import os
 
 from django.conf import settings
 from django.db import models
-# Create your models here.
 
+
+# Create your models here.
 
 
 def upload_image(instance, filename):
@@ -13,6 +14,7 @@ def upload_image(instance, filename):
 class StatusChoice(models.TextChoices):
     PENDING = 'pending', 'Pending'
     PUBLISHED = 'publish', 'Publish'
+    TRASH = 'trash', 'Trash'
 
 
 class Topic(models.Model):
