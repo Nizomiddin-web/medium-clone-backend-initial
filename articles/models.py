@@ -1,5 +1,6 @@
 import os
 
+from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.db import models
 
@@ -36,7 +37,7 @@ class Article(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     summary = models.CharField(max_length=400)
-    content = models.TextField()
+    content = RichTextField()
     status = models.CharField(max_length=20, choices=StatusChoice.choices, default=StatusChoice.PENDING)
     thumbnail = models.ImageField(upload_to=upload_image, null=True, blank=True)
     views_count = models.PositiveIntegerField(default=0)
@@ -64,7 +65,7 @@ class Clap(models.Model):
 class Comment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
-    content = models.TextField()
+    content = RichTextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
