@@ -76,3 +76,14 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.username}"
+
+
+class TopicFollow(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ['user', 'topic']
+
+    def __str__(self):
+        return f"{self.user} follow {self.topic}"
