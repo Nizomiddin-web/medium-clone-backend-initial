@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django_filters import rest_framework as filters
 
 from articles.models import Article
@@ -24,12 +25,10 @@ class ArticleFilter(filters.FilterSet):
 
     def search_filter_method(self, queryset, name, value):
         if value:
-            queryset1 = queryset.filter(title__icontains=value)
-            if len(queryset1) == 0:
-                queryset1 = queryset.filter(topics__name__icontains=value)
-            if len(queryset1) == 0:
-                queryset1 = queryset.filter(summary__icontains=value)
-            if len(queryset1) == 0:
-                queryset1 = queryset.filter(content__icontains=value)
-            return queryset1
+            # Create a Q object to combine all the search criteria
+            query = Q(title__icontains=value) | Q(topics__name__icontains=value) | Q(summary__icontains=value) | Q(
+                content__icontains=value)
+            # Use the Q object to filter the queryset
+            return queryset.filter(query)
+
         return queryset
