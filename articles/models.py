@@ -89,3 +89,18 @@ class TopicFollow(models.Model):
 
     def __str__(self):
         return f"{self.user} follow {self.topic}"
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="favorite_article")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'favorite'
+        verbose_name = 'Favorite'
+        verbose_name_plural = 'Favorites'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user} favorite to {self.article}"

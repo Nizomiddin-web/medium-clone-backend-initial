@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import generics
 from articles.filters import ArticleFilter
-from articles.models import Article, Topic, TopicFollow, Comment
+from articles.models import Article, Topic, TopicFollow, Comment, Favorite
 from articles.permissions import IsOwnerOrReadOnly, IsOwnerComment
 from articles.serializers import ArticleCreateSerializer, ArticleDetailSerializer, ArticleListSerializer, \
     TopicSerializer, CommentSerializer, ArticleDetailCommentsSerializer
@@ -139,3 +139,30 @@ class ArticleDetailCommentsView(generics.RetrieveAPIView):
             ]
         }
         return Response(response_data)
+
+
+class FavoriteArticleView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, id):
+        article = get_object_or_404(Article, id=id)
+        user = request.user
+
+        if article:
+            if Favorite.objects.filter(user=user, article=article).exists():
+                return Response({"detail": "Maqola sevimlilarga allaqachon qo'shilgan."},
+                                status=status.HTTP_400_BAD_REQUEST)
+            Favorite.objects.create(user=user, article=article)
+            return Response({"detail": "Maqola sevimlilarga qo'shildi."}, status=status.HTTP_201_CREATED)
+
+        return Response({"detail": "Maqola topilmadi."}, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, id):
+        article = get_object_or_404(Article, id=id)
+        user = request.user
+        if article:
+            favorite = Favorite.objects.filter(user=user, article=article).first()
+            if favorite:
+                favorite.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail": "Maqola topilmadi."}, status=status.HTTP_404_NOT_FOUND)
