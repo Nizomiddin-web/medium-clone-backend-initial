@@ -469,7 +469,7 @@ def test_get_comment_from_article(api_client, tokens, get_comment_from_article):
     client = api_client(token=access)
 
     response = client.get(f'/articles/{article_id}/detail/comments/')
-
+    print(response)
     assert response.status_code == status_code
 
     if status_code == status.HTTP_200_OK:

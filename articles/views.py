@@ -8,10 +8,10 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import generics
 from articles.filters import ArticleFilter
-from articles.models import Article, Topic, TopicFollow
-from articles.permissions import IsOwnerOrReadOnly
+from articles.models import Article, Topic, TopicFollow, Comment
+from articles.permissions import IsOwnerOrReadOnly, IsOwnerComment
 from articles.serializers import ArticleCreateSerializer, ArticleDetailSerializer, ArticleListSerializer, \
-    TopicSerializer
+    TopicSerializer, CommentSerializer, ArticleDetailCommentsSerializer
 
 
 class ArticlesView(ModelViewSet):
@@ -90,3 +90,52 @@ class TopicFollowView(APIView):
         return Response({
             "detail": "Hech qanday mavzu berilgan soʻrovga mos kelmaydi."
         }, status=status.HTTP_404_NOT_FOUND)
+
+
+class CreateCommentsView(generics.CreateAPIView):
+    serializer_class = CommentSerializer
+    queryset = Comment
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        id = kwargs.get('id')
+        try:
+            article = Article.objects.get(id=id)
+            if article.status != "publish":
+                return Response({"detail": "Izoh yozish uchun maqola statusi 'publish' bo'lishi kerak."},
+                                status=status.HTTP_404_NOT_FOUND)
+            serializer = self.get_serializer(data=request.data, context={'id': id, 'request': request})
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Article.DoesNotExist:
+            return Response({"detail": 'No Article matches the given query.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class CommentsView(ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsOwnerComment]
+    http_method_names = ['patch', 'delete']
+
+
+class ArticleDetailCommentsView(generics.RetrieveAPIView):
+    queryset = Article.objects.all()
+    serializer_class = ArticleDetailCommentsSerializer
+    lookup_field = 'id'
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+
+        response_data = {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "comments": serializer.data['comments']
+                }
+            ]
+        }
+        return Response(response_data)

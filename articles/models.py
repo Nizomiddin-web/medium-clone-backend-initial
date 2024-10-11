@@ -68,6 +68,8 @@ class Comment(models.Model):
     content = RichTextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+
     class Meta:
         db_table = 'comment'
         verbose_name = 'Comment'
