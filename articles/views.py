@@ -2,6 +2,7 @@ from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,6 +13,7 @@ from articles.models import Article, Topic, TopicFollow, Comment, Favorite, Clap
 from articles.permissions import IsOwnerOrReadOnly, IsOwnerComment
 from articles.serializers import ArticleCreateSerializer, ArticleDetailSerializer, ArticleListSerializer, \
     TopicSerializer, CommentSerializer, ArticleDetailCommentsSerializer, ClapSerializer
+from users.models import ReadingHistory
 
 
 class ArticlesView(ModelViewSet):
@@ -19,6 +21,16 @@ class ArticlesView(ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = ArticleFilter
     permission_classes = [IsOwnerOrReadOnly]
+    lookup_field = 'id'
+
+    @action(detail=True, methods=['post'])
+    def read(self, request, id):
+        article = get_object_or_404(Article, id=id)
+        if article and article.status == 'publish':
+            article.reads_count += 1
+            article.save()
+            return Response({"detail": "Maqolani o'qish soni ortdi."}, status=status.HTTP_200_OK)
+        return Response({"detail": "Not Found."}, status=status.HTTP_404_NOT_FOUND)
 
     def get_queryset(self):
         if self.action == 'list':
@@ -45,7 +57,8 @@ class ArticlesView(ModelViewSet):
             return Response({"detail": "Ma'lumot topilmadi"}, status=status.HTTP_404_NOT_FOUND)
         instance.views_count += 1
         instance.save()
-
+        if not ReadingHistory.objects.filter(user=request.user, article=instance).exists():
+            ReadingHistory.objects.create(user=request.user, article=instance)
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 

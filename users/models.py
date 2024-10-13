@@ -107,3 +107,17 @@ class Recommendation(models.Model):
 
     def __str__(self):
         return f"Recommendations for {self.user.username}"
+
+
+class ReadingHistory(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='reading_history')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'reading_history'
+        verbose_name = 'Reading history'
+        verbose_name_plural = 'Reading Histories'
+
+    def __str__(self):
+        return f"{self.user} history  {self.article}"

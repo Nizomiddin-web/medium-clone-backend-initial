@@ -9,10 +9,11 @@ class ArticleFilter(filters.FilterSet):
     get_top_articles = filters.NumberFilter(field_name="views_count", method="filter_top_articles")
     topic_id = filters.NumberFilter(field_name="topics", method="filter_topic_id")
     is_user_favorites = filters.BooleanFilter(method='filter_favorites')
+    is_reading_history = filters.BooleanFilter(method='filter_reading_history')
 
     class Meta:
         model = Article
-        fields = ['get_top_articles', 'topic_id', 'is_recommend', 'search', 'is_user_favorites']
+        fields = ['get_top_articles', 'topic_id', 'is_recommend', 'search', 'is_user_favorites', 'is_reading_history']
 
     def filter_top_articles(self, queryset, name, value):
         if value:
@@ -38,4 +39,10 @@ class ArticleFilter(filters.FilterSet):
         if value:
             user = self.request.user
             return queryset.filter(favorite_article__user=user)
+        return queryset
+
+    def filter_reading_history(self, queryset, name, value):
+        if value:
+            user = self.request.user
+            return queryset.filter(reading_history__user=user)
         return queryset
