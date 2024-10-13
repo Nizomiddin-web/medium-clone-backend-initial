@@ -60,6 +60,12 @@ class Article(models.Model):
 class Clap(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='claps')
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='claps')
+    count = models.PositiveIntegerField(default=1)
+
+    def update_count(self):
+        if self.count < 50:
+            self.count += 1
+            self.save()
 
 
 class Comment(models.Model):

@@ -43,9 +43,24 @@ class ArticleCreateSerializer(serializers.ModelSerializer):
 
 
 class ClapSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = Clap
-        fields = ['user', 'article']
+        fields = ['user', 'article', 'count']
+        read_only_fields = ['user', 'article', 'count']
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        id = self.context.get('id')
+        article = Article.objects.get(id=id)
+        user = request.user
+        clap = Clap.objects.filter(user=user, article=article).first()
+        if clap:
+            clap.update_count()
+            return clap
+        clap = Clap.objects.create(user=user, article=article)
+        return clap
 
 
 class CommentSerializer(serializers.ModelSerializer):

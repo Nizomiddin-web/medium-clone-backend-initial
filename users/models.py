@@ -83,6 +83,7 @@ class Recommendation(models.Model):
     more_recommend = models.ManyToManyField(Topic, related_name='more_recommended_by_users', blank=True)
     less_recommend = models.ManyToManyField(Topic, related_name='less_recommended_by_users', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
     class Meta:
         db_table = 'recommendation'
         verbose_name = 'Recommendation'
@@ -103,7 +104,6 @@ class Recommendation(models.Model):
         # `more_recommend` ichida yo'qligini tekshirish
         if not article_topics.filter(id__in=self.more_recommend.all()).exists():
             self.less_recommend.add(*article_topics)  # Faqat `more_recommend` da yo'q bo'lsa qo'shish
-
 
     def __str__(self):
         return f"Recommendations for {self.user.username}"

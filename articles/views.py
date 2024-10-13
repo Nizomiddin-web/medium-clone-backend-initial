@@ -8,10 +8,10 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import generics
 from articles.filters import ArticleFilter
-from articles.models import Article, Topic, TopicFollow, Comment, Favorite
+from articles.models import Article, Topic, TopicFollow, Comment, Favorite, Clap
 from articles.permissions import IsOwnerOrReadOnly, IsOwnerComment
 from articles.serializers import ArticleCreateSerializer, ArticleDetailSerializer, ArticleListSerializer, \
-    TopicSerializer, CommentSerializer, ArticleDetailCommentsSerializer
+    TopicSerializer, CommentSerializer, ArticleDetailCommentsSerializer, ClapSerializer
 
 
 class ArticlesView(ModelViewSet):
@@ -166,3 +166,42 @@ class FavoriteArticleView(APIView):
                 favorite.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
         return Response({"detail": "Maqola topilmadi."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class ClapView(ModelViewSet):
+    serializer_class = ClapSerializer
+    queryset = Clap.objects.all()
+    http_method_names = ['post', 'delete']
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id'
+
+    def create(self, request, *args, **kwargs):
+        id = kwargs.get('id')
+        try:
+            article = Article.objects.get(id=id)
+            if article.status != 'publish':
+                return Response({"detail": "clap bosish uchun maqola statusi 'publish' bo'lishi kerak."},
+                                status=status.HTTP_404_NOT_FOUND)
+            serializer = self.get_serializer(data=request.data, context={'request': request, 'id': id})
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except:
+            return Response({"detail": "Maqola topilmadi."}, status=status.HTTP_404_NOT_FOUND)
+
+    def destroy(self, request, *args, **kwargs):
+        id = kwargs.get('id')
+        try:
+            article = Article.objects.get(id=id)
+            if article.status != 'publish':
+                return Response({"detail": "clap bosish uchun maqola statusi 'publish' bo'lishi kerak."},
+                                status=status.HTTP_404_NOT_FOUND)
+            user = request.user
+            clap = article.claps.filter(user=user).first()
+            if clap:
+                self.perform_destroy(clap)
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({"detail": "'Not found."},
+                            status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response({"detail": "Maqola topilmadi."}, status=status.HTTP_404_NOT_FOUND)
