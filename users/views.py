@@ -2,6 +2,7 @@ import random
 from secrets import token_urlsafe
 
 from django.contrib.auth.hashers import make_password
+from django.db.models import Sum
 from rest_framework import status, permissions, generics, parsers, exceptions
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
@@ -15,7 +16,7 @@ from articles.models import Article
 from .errors import ACTIVE_USER_NOT_FOUND_ERROR_MSG
 
 # from .models import Recommendation
-from .models import Recommendation
+from .models import Recommendation, CustomUser
 from .serializers import UserSerializer, LoginSerializer, ValidationErrorSerializer, TokenResponseSerializer, \
     UserUpdateSerializer, ChangePasswordSerializer, ForgotPasswordRequestSerializer, ForgotPasswordResponseSerializer, \
     ForgotPasswordVerifyRequestSerializer, ForgotPasswordVerifyResponseSerializer, ResetPasswordResponseSerializer, \
@@ -321,4 +322,10 @@ class RecommendationView(generics.CreateAPIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class PopularAuthorsView(generics.ListAPIView):
+    queryset = CustomUser.objects.annotate(total_reads=Sum('article_set__reads_count')).order_by('-total_reads').filter(article_set__status='publish')[:5]
+    serializer_class = UserSerializer
+
 

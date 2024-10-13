@@ -34,7 +34,7 @@ class Topic(models.Model):
 
 
 class Article(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='article_set')
     title = models.CharField(max_length=200)
     summary = models.CharField(max_length=400)
     content = RichTextField()
@@ -110,5 +110,3 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.user} favorite to {self.article}"
-
-
