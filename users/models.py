@@ -121,3 +121,18 @@ class ReadingHistory(models.Model):
 
     def __str__(self):
         return f"{self.user} history  {self.article}"
+
+class Follow(models.Model):
+    follower = models.ForeignKey(CustomUser,on_delete=models.CASCADE,related_name="follow_authors")
+    followee = models.ForeignKey(CustomUser,on_delete=models.CASCADE,related_name="followers")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table='follow'
+        verbose_name='Follow'
+        verbose_name_plural='Follows'
+
+    def __str__(self):
+        return f"{self.follower} follow to {self.followee}"
+

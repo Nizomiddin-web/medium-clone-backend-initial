@@ -3,7 +3,7 @@ from secrets import token_urlsafe
 
 from django.contrib.auth.hashers import make_password
 from django.db.models import Sum
-from rest_framework import status, permissions, generics, parsers, exceptions
+from rest_framework import status, permissions, generics, parsers, exceptions, mixins
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -16,7 +16,7 @@ from articles.models import Article
 from .errors import ACTIVE_USER_NOT_FOUND_ERROR_MSG
 
 # from .models import Recommendation
-from .models import Recommendation, CustomUser
+from .models import Recommendation, CustomUser, Follow
 from .serializers import UserSerializer, LoginSerializer, ValidationErrorSerializer, TokenResponseSerializer, \
     UserUpdateSerializer, ChangePasswordSerializer, ForgotPasswordRequestSerializer, ForgotPasswordResponseSerializer, \
     ForgotPasswordVerifyRequestSerializer, ForgotPasswordVerifyResponseSerializer, ResetPasswordResponseSerializer, \
@@ -323,9 +323,71 @@ class RecommendationView(generics.CreateAPIView):
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
-class PopularAuthorsView(generics.ListAPIView):
-    queryset = CustomUser.objects.annotate(total_reads=Sum('article_set__reads_count')).order_by('-total_reads').filter(article_set__status='publish')[:5]
+@extend_schema_view(
+    patch=extend_schema(
+        summary="Popular Author View",
+        request=UserSerializer,
+        responses={
+            204: UserSerializer,
+            404: UserSerializer
+        }
+    )
+)
+class PopularAuthorsView(generics.ListAPIView,generics.DestroyAPIView):
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
+    http_method_names = ['get','delete']
 
+    def get_queryset(self):
+        if self.request.method=='GET':
+            return CustomUser.objects.annotate(total_reads=Sum('article_set__reads_count')).order_by('-total_reads').filter(article_set__status='publish')[:5]
+        elif self.request.method=='DELETE':
+            return self.queryset
 
+    def destroy(self, request, *args, **kwargs):
+        author = self.get_object()
+        user=request.user
+        if Follow.objects.filter(follower=user,followee=author).exists():
+            follow = Follow.objects.get(follower=user,followee=author)
+            self.perform_destroy(follow)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+class AuthorFollowView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request,id):
+        author = get_object_or_404(CustomUser,id=id)
+        user = request.user
+        if not Follow.objects.filter(follower=user,followee=author).exists():
+            Follow.objects.create(follower=user,followee=author)
+            return Response({"detail":"Mofaqqiyatli follow qilindi."},status=status.HTTP_201_CREATED)
+        return Response({"detail":"Siz allaqachon ushbu foydalanuvchini kuzatyapsiz."},status=status.HTTP_200_OK)
+
+    def delete(self,request,id):
+        author = get_object_or_404(CustomUser, id=id)
+        user = request.user
+        if  Follow.objects.filter(follower=user, followee=author).exists():
+            obj=Follow.objects.get(follower=user, followee=author)
+            obj.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail": "Follow Not Fount"}, status=status.HTTP_404_NOT_FOUND)
+
+class FollowersListView(generics.ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        followers = Follow.objects.filter(followee=user).values_list('follower', flat=True)
+        return CustomUser.objects.filter(id__in=followers)
+
+class FollowingListView(generics.ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        following_id = Follow.objects.filter(follower=user).values_list('followee',flat=True)
+        return CustomUser.objects.filter(id__in=following_id)

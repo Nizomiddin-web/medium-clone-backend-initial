@@ -11,5 +11,8 @@ urlpatterns = [
     path('password/forgot/verify/<str:otp_secret>/', views.ForgotPasswordVerifyView.as_view(), name="forgot-verify"),
     path('password/reset/', views.ResetPasswordView.as_view(), name='reset-password'),
     path('recommend/', views.RecommendationView.as_view(), name='recommend'),
-    path('articles/popular/', views.PopularAuthorsView.as_view(), name='popular-user'),
+    path('articles/popular/', views.PopularAuthorsView.as_view(http_method_names=['get']), name='popular-user'),
+    path('followers/',views.FollowersListView.as_view(),name='followers-list'),
+    path('following/',views.FollowingListView.as_view(),name='following-list'),
+    path('<int:id>/follow/',views.AuthorFollowView.as_view(),name='author-follow'),
 ]

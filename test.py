@@ -127,3 +127,4 @@ def is_isomorphic(s: str, t: str) -> bool:
 
 
 print(is_isomorphic("foo", "bar"))
+

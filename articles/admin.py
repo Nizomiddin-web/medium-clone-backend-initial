@@ -14,7 +14,7 @@ class TopicAdmin(admin.ModelAdmin):
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ['id', 'author', 'title', 'summary', 'content']
+    list_display = ['id', 'author', 'title', 'summary']
 
 
 @admin.register(Favorite)
