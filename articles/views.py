@@ -1,8 +1,10 @@
+from tracemalloc import Trace
+
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,24 +15,56 @@ from articles.models import Article, Topic, TopicFollow, Comment, Favorite, Clap
 from articles.permissions import IsOwnerOrReadOnly, IsOwnerComment
 from articles.serializers import ArticleCreateSerializer, ArticleDetailSerializer, ArticleListSerializer, \
     TopicSerializer, CommentSerializer, ArticleDetailCommentsSerializer, ClapSerializer
-from users.models import ReadingHistory
+from users.models import ReadingHistory, Pin
 
 
 class ArticlesView(ModelViewSet):
     queryset = Article.objects.all()
     filter_backends = (DjangoFilterBackend,)
     filterset_class = ArticleFilter
-    permission_classes = [IsOwnerOrReadOnly]
     lookup_field = 'id'
 
     @action(detail=True, methods=['post'])
     def read(self, request, id):
         article = get_object_or_404(Article, id=id)
-        if article and article.status == 'publish':
+        if article.status == 'publish':
             article.reads_count += 1
             article.save()
             return Response({"detail": "Maqolani o'qish soni ortdi."}, status=status.HTTP_200_OK)
         return Response({"detail": "Not Found."}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True,methods=['post'])
+    def archive(self,request,id):
+        article = get_object_or_404(Article,id=id)
+        if article.status=='publish':
+            article.status='archive'
+            article.save()
+            return Response({"detail": "Maqola arxivlandi."},status=status.HTTP_200_OK)
+        return Response({"detail":"Not Found."},status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True,methods=['post'])
+    def pin(self,request,id):
+        article = get_object_or_404(Article,id=id)
+        print(article)
+        if article.status=='publish':
+            user = request.user
+            print(user)
+            if not Pin.objects.filter(user=user,article=article).exists():
+                Pin.objects.create(user=user,article=article)
+                return Response({"detail": "Maqola pin qilindi."},status=status.HTTP_200_OK)
+            return Response({"detail":"Maqola Pin qilingan"},status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail":"Article not published"},status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True,methods=['delete'])
+    def unpin(self,request,id):
+        article = get_object_or_404(Article,id=id)
+        if article.status=='publish':
+            if Pin.objects.filter(user=request.user,article=article).exists():
+                pin = Pin.objects.get(user=request.user,article=article)
+                pin.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({"detail":"Maqola topilmadi.."},status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail":"Article not published"},status=status.HTTP_404_NOT_FOUND)
 
     def get_queryset(self):
         if self.action == 'list':
@@ -48,6 +82,16 @@ class ArticlesView(ModelViewSet):
         if self.action == 'list':
             return ArticleListSerializer
         return super().get_serializer_class()
+
+    def get_permissions(self):
+        is_author_article = self.request.query_params.get('is_author_article')
+        if is_author_article:
+            return [IsAuthenticated()]
+        if self.action in ['pin','unpin']:
+            permission_classes=[IsAuthenticated]
+        else:
+            permission_classes=[IsOwnerOrReadOnly]
+        return [permission() for permission in permission_classes]
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()

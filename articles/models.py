@@ -16,6 +16,7 @@ class StatusChoice(models.TextChoices):
     PENDING = 'pending', 'Pending'
     PUBLISHED = 'publish', 'Publish'
     TRASH = 'trash', 'Trash'
+    Archive = 'archive','Archive'
 
 
 class Topic(models.Model):
@@ -110,4 +111,5 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.user} favorite to {self.article}"
+
 

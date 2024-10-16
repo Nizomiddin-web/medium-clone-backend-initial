@@ -136,3 +136,11 @@ class Follow(models.Model):
     def __str__(self):
         return f"{self.follower} follow to {self.followee}"
 
+class Pin(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    article = models.ForeignKey(Article,on_delete=models.CASCADE,related_name="pin_articles")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} Pined {self.article}"

@@ -126,5 +126,14 @@ def is_isomorphic(s: str, t: str) -> bool:
     return True
 
 
-print(is_isomorphic("foo", "bar"))
+# print(is_isomorphic("foo", "bar"))
 
+def is_happy(n: int) -> bool:
+    seen=set()
+    while n!=0 and n not in seen:
+        seen.add(n)
+        n=sum(int(i)**2 for i in str(n))
+        print(n)
+    return n==1
+
+is_happy(7)
