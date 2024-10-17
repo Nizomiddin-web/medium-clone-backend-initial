@@ -30,7 +30,7 @@ class ArticlesView(ModelViewSet):
         if article.status == 'publish':
             article.reads_count += 1
             article.save()
-            return Response({"detail": "Maqolani o'qish soni ortdi."}, status=status.HTTP_200_OK)
+            return Response({"detail": "Maqolani o'qish soni ortdi."}, status=status.HTTP_201_CREATED)
         return Response({"detail": "Not Found."}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True,methods=['post'])
