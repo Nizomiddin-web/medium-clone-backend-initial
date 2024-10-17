@@ -1,3 +1,5 @@
+from email.policy import default
+
 from django.apps import apps
 from django.conf import settings
 from django.contrib.postgres.indexes import HashIndex
@@ -149,6 +151,7 @@ class Notification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     message = models.CharField(max_length=200)
     read_at = models.BooleanField(null=True,blank=True)
+    read = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
