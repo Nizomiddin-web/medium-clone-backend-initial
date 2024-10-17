@@ -45,6 +45,9 @@ def test_notifications(notification_data_factory, api_client, tokens):
 
     # Test getting all notifications
     response = client.get('/users/notifications/')
+    print(response)
+    print(user)
+    print(notifications)
     assert response.status_code == status.HTTP_200_OK
     assert len(response.data['results']) == len(notifications)
 
@@ -57,7 +60,7 @@ def test_notifications(notification_data_factory, api_client, tokens):
         assert response.data['id'] == notification.id
 
         # Test updating a notification to mark it as read
-        response = client.patch(f'/users/notifications/{notification.id}/', data={'read': True})
+        response = client.patch(f'/users/notifications/{notification.id}/', data={'read_at': True})
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
         notification.refresh_from_db()

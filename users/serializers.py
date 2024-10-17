@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from articles.models import Article
 from users.errors import BIRTH_YEAR_ERROR_MSG
 # from users.models import Recommendation
-from users.models import Recommendation
+from users.models import Recommendation, Notification
 
 User = get_user_model()
 
@@ -187,3 +187,11 @@ class RecommendationSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'
+        extra_kwargs = {
+            'author':{'write_only':True}
+        }

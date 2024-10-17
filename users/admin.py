@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 # Register your models here.
-from .models import CustomUser, ReadingHistory
+from .models import CustomUser, ReadingHistory, Notification
 
 
 @admin.register(CustomUser)
@@ -21,3 +21,7 @@ class CustomUserAdmin(UserAdmin):
 @admin.register(ReadingHistory)
 class ReadingHistoryAdmin(admin.ModelAdmin):
     list_display = ['user', 'article', 'created_at']
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ['user','message','created_at']

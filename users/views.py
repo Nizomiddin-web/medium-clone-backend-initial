@@ -3,12 +3,14 @@ from secrets import token_urlsafe
 
 from django.contrib.auth.hashers import make_password
 from django.db.models import Sum
+from django.template.context_processors import request
 from rest_framework import status, permissions, generics, parsers, exceptions, mixins
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate, update_session_auth_hash
+from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 
@@ -16,11 +18,11 @@ from articles.models import Article
 from .errors import ACTIVE_USER_NOT_FOUND_ERROR_MSG
 
 # from .models import Recommendation
-from .models import Recommendation, CustomUser, Follow
+from .models import Recommendation, CustomUser, Follow, Notification
 from .serializers import UserSerializer, LoginSerializer, ValidationErrorSerializer, TokenResponseSerializer, \
     UserUpdateSerializer, ChangePasswordSerializer, ForgotPasswordRequestSerializer, ForgotPasswordResponseSerializer, \
     ForgotPasswordVerifyRequestSerializer, ForgotPasswordVerifyResponseSerializer, ResetPasswordResponseSerializer, \
-    RecommendationSerializer
+    RecommendationSerializer, NotificationSerializer
 
 from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema, extend_schema_view
@@ -360,6 +362,7 @@ class AuthorFollowView(APIView):
         user = request.user
         if not Follow.objects.filter(follower=user,followee=author).exists():
             Follow.objects.create(follower=user,followee=author)
+            Notification.objects.create(author=author,message=f"{user.username} sizga follow qildi.")
             return Response({"detail":"Mofaqqiyatli follow qilindi."},status=status.HTTP_201_CREATED)
         return Response({"detail":"Siz allaqachon ushbu foydalanuvchini kuzatyapsiz."},status=status.HTTP_200_OK)
 
@@ -391,3 +394,19 @@ class FollowingListView(generics.ListAPIView):
         user = self.request.user
         following_id = Follow.objects.filter(follower=user).values_list('followee',flat=True)
         return CustomUser.objects.filter(id__in=following_id)
+
+class UserNotificationView(ModelViewSet):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['get','patch']
+
+    def get_queryset(self):
+        author = self.request.user
+        queryset = self.queryset.filter(user=author,read_at=None)
+        return queryset
+
+    def partial_update(self, request, *args, **kwargs):
+        super().partial_update(request,*args,**kwargs)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+

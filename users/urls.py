@@ -1,6 +1,10 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
 from . import views
 
+router = DefaultRouter()
+router.register(r'notifications',views.UserNotificationView,basename='notification')
 urlpatterns = [
     path('signup/', views.SignupView.as_view(), name='signup'),
     path('login/', views.LoginView.as_view(), name='login'),
@@ -15,4 +19,5 @@ urlpatterns = [
     path('followers/',views.FollowersListView.as_view(),name='followers-list'),
     path('following/',views.FollowingListView.as_view(),name='following-list'),
     path('<int:id>/follow/',views.AuthorFollowView.as_view(),name='author-follow'),
+    path('',include(router.urls))
 ]
