@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import generics
 from articles.filters import ArticleFilter
-from articles.models import Article, Topic, TopicFollow, Comment, Favorite, Clap
+from articles.models import Article, Topic, TopicFollow, Comment, Favorite, Clap, Report
 from articles.permissions import IsOwnerOrReadOnly, IsOwnerComment
 from articles.serializers import ArticleCreateSerializer, ArticleDetailSerializer, ArticleListSerializer, \
     TopicSerializer, CommentSerializer, ArticleDetailCommentsSerializer, ClapSerializer
@@ -262,3 +262,21 @@ class ClapView(ModelViewSet):
                             status=status.HTTP_404_NOT_FOUND)
         except:
             return Response({"detail": "Maqola topilmadi."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class ReportArticleView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request,id):
+        article = get_object_or_404(Article,id=id)
+        if article.status=="publish":
+            user=request.user
+            report = Report.objects.filter(article=article)
+            if len(report)>2:
+                article.status="trash"
+                article.save()
+                return Response({"detail":"Maqola bir nechta shikoyatlar tufayli olib tashlandi."},status=status.HTTP_200_OK)
+            if not Report.objects.filter(user=user,article=article).exists():
+                Report.objects.create(user=user,article=article)
+                return Response({"detail": "Shikoyat yuborildi."},status=status.HTTP_201_CREATED)
+            return Response(["Ushbu maqola allaqachon shikoyat qilingan."],status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail":"No Article matches the given query."},status=status.HTTP_404_NOT_FOUND)

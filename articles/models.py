@@ -113,3 +113,14 @@ class Favorite(models.Model):
         return f"{self.user} favorite to {self.article}"
 
 
+class Report(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    article = models.ForeignKey(Article,on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user','article'],name="unique_fields_user_article")
+        ]
+
+    def __str__(self):
+        return f"{self.user} report to {self.article}"
