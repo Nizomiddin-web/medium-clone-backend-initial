@@ -362,7 +362,7 @@ class AuthorFollowView(APIView):
         user = request.user
         if not Follow.objects.filter(follower=user,followee=author).exists():
             Follow.objects.create(follower=user,followee=author)
-            Notification.objects.create(author=author,message=f"{user.username} sizga follow qildi.")
+            Notification.objects.create(user=author,message=f"{user.username} sizga follow qildi.")
             return Response({"detail":"Mofaqqiyatli follow qilindi."},status=status.HTTP_201_CREATED)
         return Response({"detail":"Siz allaqachon ushbu foydalanuvchini kuzatyapsiz."},status=status.HTTP_200_OK)
 

@@ -73,6 +73,7 @@ def test_follow_author(api_client, follow_author_data, tokens):
 
     if author:
         response = client.post(f"/users/{author.id}/follow/")
+        print(response.content)
         assert response.status_code == status_code
         assert response.data['detail'] in ["Mofaqqiyatli follow qilindi.", "Siz allaqachon ushbu foydalanuvchini kuzatyapsiz."]
 
