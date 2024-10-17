@@ -150,8 +150,8 @@ class Pin(models.Model):
 class Notification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     message = models.CharField(max_length=200)
-    read_at = models.BooleanField(null=True,blank=True)
-    read = models.BooleanField(default=True)
+    read_at = models.DateTimeField(null=True,blank=True,auto_now=True)
+    read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

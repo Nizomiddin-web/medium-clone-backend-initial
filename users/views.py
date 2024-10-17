@@ -403,7 +403,7 @@ class UserNotificationView(ModelViewSet):
 
     def get_queryset(self):
         author = self.request.user
-        queryset = self.queryset.filter(user=author,read_at=None)
+        queryset = self.queryset.filter(user=author,read=False)
         return queryset
 
     def partial_update(self, request, *args, **kwargs):
