@@ -5,16 +5,16 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import action, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import generics
 from articles.filters import ArticleFilter
-from articles.models import Article, Topic, TopicFollow, Comment, Favorite, Clap, Report
+from articles.models import Article, Topic, TopicFollow, Comment, Favorite, Clap, Report, FAQ
 from articles.permissions import IsOwnerOrReadOnly, IsOwnerComment
 from articles.serializers import ArticleCreateSerializer, ArticleDetailSerializer, ArticleListSerializer, \
-    TopicSerializer, CommentSerializer, ArticleDetailCommentsSerializer, ClapSerializer
+    TopicSerializer, CommentSerializer, ArticleDetailCommentsSerializer, ClapSerializer, FAQSerializer
 from users.models import ReadingHistory, Pin
 
 
@@ -280,3 +280,8 @@ class ReportArticleView(APIView):
                 return Response({"detail": "Shikoyat yuborildi."},status=status.HTTP_201_CREATED)
             return Response(["Ushbu maqola allaqachon shikoyat qilingan."],status=status.HTTP_400_BAD_REQUEST)
         return Response({"detail":"No Article matches the given query."},status=status.HTTP_404_NOT_FOUND)
+
+class FAQListView(generics.ListAPIView):
+    queryset = FAQ.objects.all()
+    serializer_class = FAQSerializer
+    permission_classes = [AllowAny]

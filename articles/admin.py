@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from articles.models import Topic, Article, Favorite, Clap
+from articles.models import Topic, Article, Favorite, Clap, FAQ
 
 
 @admin.register(Topic)
@@ -25,3 +25,7 @@ class FavoriteAdmin(admin.ModelAdmin):
 @admin.register(Clap)
 class ClapAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'article', 'count']
+
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ['id','question','answer']

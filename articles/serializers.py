@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from articles.models import Article, Topic, Clap, Comment
+from articles.models import Article, Topic, Clap, Comment, FAQ
 from users.models import CustomUser
 from users.serializers import UserSerializer
 
@@ -118,3 +118,8 @@ class ArticleDetailCommentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ['comments']
+
+class FAQSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQ
+        fields = '__all__'
