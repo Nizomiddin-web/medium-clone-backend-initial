@@ -20,22 +20,21 @@ class UserSerializer(serializers.ModelSerializer):  # user uchun [serializer](<h
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'middle_name', 'email', 'avatar', 'password',
-                  'birth_year']
+        fields = ['id', 'username', 'first_name', 'last_name', 'middle_name', 'email', 'avatar', 'password']
         extra_kwargs = {'password': {'write_only': True}}
 
-    def validate_birth_year(self, value):
-        if not (settings.BIRTH_YEAR_MIN < value < settings.BIRTH_YEAR_MAX):
-            raise serializers.ValidationError(BIRTH_YEAR_ERROR_MSG)
-        return value
+    # def validate_birth_year(self, value):
+    #     if not (settings.BIRTH_YEAR_MIN < value < settings.BIRTH_YEAR_MAX):
+    #         raise serializers.ValidationError(BIRTH_YEAR_ERROR_MSG)
+    #     return value
 
-    def validate(self, data):
-        birth_year = data.get('birth_year')
-
-        if birth_year is not None:
-            if not (settings.BIRTH_YEAR_MIN < birth_year < settings.BIRTH_YEAR_MAX):
-                raise serializers.ValidationError({'birth_year': BIRTH_YEAR_ERROR_MSG})
-            return data
+    # def validate(self, data):
+    #     birth_year = data.get('birth_year')
+    #
+    #     if birth_year is not None:
+    #         if not (settings.BIRTH_YEAR_MIN < birth_year < settings.BIRTH_YEAR_MAX):
+    #             raise serializers.ValidationError({'birth_year': BIRTH_YEAR_ERROR_MSG})
+    #         return data
 
     def create(self, validated_data):  # user create qilish uchun method
         user = User(

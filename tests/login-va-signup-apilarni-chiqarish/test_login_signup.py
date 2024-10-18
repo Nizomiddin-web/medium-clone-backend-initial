@@ -193,6 +193,7 @@ def test_signup(signup_data, api_client):
     status_code, req_json = signup_data()
     url = '/users/signup/'
     resp = client.post(url, data=req_json, format='json')
+    print(resp.content)
     assert resp.status_code == status_code
     if status_code == status.HTTP_201_CREATED:
         resp_json = resp.json()
