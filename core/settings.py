@@ -20,7 +20,7 @@ SECRET_KEY = config('SECRET_KEY', default='')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['medium-clone-backend-initial-tan.vercel.app','localhost']
 
 # Application definition
 DJANGO_APPS = [
