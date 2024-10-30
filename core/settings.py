@@ -11,6 +11,7 @@ from core.custom_logging import InterceptHandler
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -22,18 +23,6 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = []
 
 # Application definition
-
-# INSTALLED_APPS = [
-#     "django.contrib.admin",
-#     "django.contrib.auth",
-#     "django.contrib.contenttypes",
-#     "django.contrib.sessions",
-#     "django.contrib.messages",
-#     "django.contrib.staticfiles",
-#     "rest_framework",
-#     "users"
-# ]
-
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -62,6 +51,7 @@ LOCAL_APPS = [
 INSTALLED_APPS = DJANGO_APPS + EXTERNAL_APPS + LOCAL_APPS
 AUTH_USER_MODEL = 'users.CustomUser'
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -92,7 +82,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "core.wsgi.application"
+# WSGI_APPLICATION = "core.wsgi.application"
+WSGI_APPLICATION = "core.wsgi.app"
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -104,11 +95,12 @@ WSGI_APPLICATION = "core.wsgi.application"
 #     }
 # }
 
-REDIS_HOST = config('REDIS_HOST', default='localhost')
-REDIS_PORT = config('REDIS_PORT', default='6379')
-REDIS_DB = config('REDIS_DB', default='1')
+# REDIS_HOST = config('REDIS_HOST', default='localhost')
+# REDIS_PORT = config('REDIS_PORT', default='6379')
+# REDIS_DB = config('REDIS_DB', default='1')
 
-REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+# REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+REDIS_URL = config('REDIS_URL')
 # redis qo'shilgan joyga yozing
 logger.info(f"Using redis | URL: {REDIS_URL}")
 
@@ -232,6 +224,9 @@ STATIC_URL = "/static/"
 
 STATIC_ROOT = BASE_DIR / "static"
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
 # media file
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -276,7 +271,6 @@ SPECTACULAR_SETTINGS = {
 }
 
 # email
-
 EMAIL_BACKEND = config('EMAIL_BACKEND', default='')
 EMAIL_HOST = config('EMAIL_HOST', default='')
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default='')
@@ -290,28 +284,28 @@ BIRTH_YEAR_MAX = datetime.now().year
 
 # LOGURU settings
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'intercept': {
-            '()': InterceptHandler,
-            'level': 0,
-        },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'django.log',
-        },
-    },
-    'loggers': {
-        '': {
-            'handlers': ['intercept', 'file'],
-            'level': "DEBUG",
-            'propagate': True,
-        },
-    }
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'intercept': {
+#             '()': InterceptHandler,
+#             'level': 0,
+#         },
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'filename': 'django.log',
+#         },
+#     },
+#     'loggers': {
+#         '': {
+#             'handlers': ['intercept', 'file'],
+#             'level': "DEBUG",
+#             'propagate': True,
+#         },
+#     }
+# }
 
 # ckeditor
 CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"

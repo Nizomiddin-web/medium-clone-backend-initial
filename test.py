@@ -136,4 +136,98 @@ def is_happy(n: int) -> bool:
         print(n)
     return n==1
 
-is_happy(7)
+# is_happy(7)
+
+def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        swapped = False
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swapped = True
+        if not swapped:  # Agar almashinish bo'lmasa, chiqish
+            break
+    return arr
+
+def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        # Katta elementlarni o‘ngga surish
+        while j >= 0 and key < arr[j]:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key  # Elementni joylashtirish
+    return arr
+
+def quick_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]  # O‘rta elementni pivot sifatida tanlash
+    left = [x for x in arr if x < pivot]  # Pivotdan kichik elementlar
+    middle = [x for x in arr if x == pivot]  # Pivotga teng elementlar
+    right = [x for x in arr if x > pivot]  # Pivotdan katta elementlar
+    return quick_sort(left) + middle + quick_sort(right)
+
+
+
+print(quick_sort([1,24,34,33,23,19,3,90,34]))
+
+def binary_search(arr, target):
+    left, right = 0, len(arr) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            return mid  # Target topildi
+        elif arr[mid] < target:
+            left = mid + 1  # O'ng qismga o‘tish
+        else:
+            right = mid - 1  # Chap qismga o‘tish
+    return -1  # Target topilmadi
+
+def linear_search(arr, target):
+     for index,val in enumerate(arr):
+         if val==target:
+             return index
+     return -1
+
+
+
+print(linear_search([1,223,2,32,32,54,67,342,21],32))
+
+def factorial(n):
+    if n==0:
+        return 1
+    else:
+        return n*factorial(n-1)
+
+# print(factorial(8))
+
+
+def fibonacci(n):
+    if n <= 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+
+
+# print(fibonacci(7))
+
+
+print(bubble_sort([64, 34, 25, 12, 22, 11, 90]))
+print(quick_sort([64, 34, 25, 12, 22, 11, 90]))
+
+print(binary_search([1, 2, 3, 4, 5, 6, 7, 8, 9],5))
+
+
+
+
+
+
+
+
+
+

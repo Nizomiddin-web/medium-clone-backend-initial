@@ -18,16 +18,16 @@ from users.enums import TokenType
 # redis uchun malumotlarni olamiz
 from users.exceptions import OTPException
 
-REDIS_HOST = config("REDIS_HOST", None)
-REDIS_PORT = config("REDIS_PORT", None)
-REDIS_DB = config("REDIS_DB", None)
+# REDIS_HOST = config("REDIS_HOST", None)
+# REDIS_PORT = config("REDIS_PORT", None)
+# REDIS_DB = config("REDIS_DB", None)
 User = get_user_model()
 
 
 class TokenService:
     @classmethod
     def get_redis_client(cls) -> redis.Redis:
-        return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+        return redis.Redis.from_url(settings.REDIS_URL)
 
     @classmethod
     def get_valid_tokens(cls, user_id: int, token_type: TokenType) -> set:
@@ -60,7 +60,7 @@ class TokenService:
         token_key = f"user:{user_id}:{token_type}"
         valid_tokens = redis_client.smembers(token_key)
         if valid_tokens is not None:
-            redis_client.delete(token_key)
+            (redis_client.delete(token_key))
 
 
 class UserService:
@@ -123,7 +123,7 @@ class SendEmailService:
 class OTPService:
     @classmethod
     def get_redis_conn(cls) -> redis.Redis:
-        return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+        return redis.Redis.from_url(settings.REDIS_URL)
 
     @classmethod
     def generate_otp(
